@@ -79,8 +79,8 @@ private fun SetupScreen() {
                 debug = when (val r = UsageRepository(context).refresh()) {
                     is FetchResult.Success -> {
                         UsageWidget.updateAll(context)
-                        "5H: ${r.snapshot.fiveHour.utilization}%   " +
-                            "1W: ${r.snapshot.sevenDay.utilization}%"
+                        "5H: ${pct(r.snapshot.fiveHour?.utilization)}   " +
+                            "1W: ${pct(r.snapshot.sevenDay?.utilization)}"
                     }
                     is FetchResult.NeedsLogin -> "Session expired. Sign in again."
                     is FetchResult.Soft -> "Transient: ${r.reason}"
@@ -103,10 +103,13 @@ private fun describe(s: Storage): String = buildString {
     append(if (s.isLoggedIn) "Signed in ✓" else "Not signed in")
     append("\norg: ").append(s.orgId ?: "-")
     if (s.hasSnapshot) {
-        append("\nlast: 5H ").append(s.fiveHourUtil.toInt()).append("%  1W ")
-            .append(s.sevenDayUtil.toInt()).append("%")
+        append("\nlast: 5H ").append(pct(s.fiveHourUtil.takeIf { s.hasFiveHour }))
+            .append("  1W ").append(pct(s.sevenDayUtil.takeIf { s.hasSevenDay }))
     }
 }
+
+/** "42%", or "n/a" for a window this plan does not have. */
+private fun pct(v: Float?): String = if (v == null) "n/a" else "${v.toInt()}%"
 
 private fun requestBatteryExemption(context: Context) {
     val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager

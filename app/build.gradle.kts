@@ -22,11 +22,11 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.usage.claudewidget"
+        applicationId = "com.usage.claudewidget.ultra"
         minSdk = 26
         targetSdk = 36
-        versionCode = 3
-        versionName = "1.0"
+        versionCode = 4
+        versionName = "1.1"
     }
 
     signingConfigs {

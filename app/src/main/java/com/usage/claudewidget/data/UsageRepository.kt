@@ -55,9 +55,11 @@ class UsageRepository(private val context: Context) {
             client.newCall(req).execute().use { resp ->
                 val body = resp.body?.string().orEmpty()
                 when {
-                    resp.code == 200 -> FetchResult.Success(
-                        UsageSnapshot.parse(body, System.currentTimeMillis())
-                    )
+                    resp.code == 200 -> try {
+                        FetchResult.Success(UsageSnapshot.parse(body, System.currentTimeMillis()))
+                    } catch (e: Exception) {
+                        FetchResult.Soft("unexpected response: ${e.message}")
+                    }
                     resp.code == 401 || resp.isRedirect -> FetchResult.NeedsLogin
                     resp.code == 403 || resp.code == 503 || body.contains("Just a moment") ->
                         FetchResult.Soft("cloudflare")

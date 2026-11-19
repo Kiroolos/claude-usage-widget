@@ -37,6 +37,8 @@ import com.usage.claudewidget.ui.MainActivity
 data class WidgetState(
     val needsLogin: Boolean,
     val hasData: Boolean,
+    val hasFiveHour: Boolean,
+    val hasSevenDay: Boolean,
     val fiveHourPct: Int,
     val fiveHourResets: String,
     val sevenDayPct: Int,
@@ -94,10 +96,15 @@ private fun FullLayout(s: WidgetState) {
                 ),
             )
         }
-        Spacer(GlanceModifier.height(10.dp))
-        MeterRow("5H", s.fiveHourPct, s.fiveHourResets)
-        Spacer(GlanceModifier.height(10.dp))
-        MeterRow("1W", s.sevenDayPct, s.sevenDayResets)
+        // Plans with only a weekly limit have no 5-hour window: show what exists.
+        if (s.hasFiveHour) {
+            Spacer(GlanceModifier.height(10.dp))
+            MeterRow("5H", s.fiveHourPct, s.fiveHourResets)
+        }
+        if (s.hasSevenDay) {
+            Spacer(GlanceModifier.height(10.dp))
+            MeterRow("1W", s.sevenDayPct, s.sevenDayResets)
+        }
     }
 }
 
@@ -132,10 +139,14 @@ private fun MeterRow(label: String, pct: Int, resets: String) {
 private fun CompactLayout(s: WidgetState) {
     Column(modifier = GlanceModifier.fillMaxSize()) {
         Lobster(16.dp)
-        Spacer(GlanceModifier.height(6.dp))
-        CompactMeter("5H", s.fiveHourPct)
-        Spacer(GlanceModifier.height(6.dp))
-        CompactMeter("1W", s.sevenDayPct)
+        if (s.hasFiveHour) {
+            Spacer(GlanceModifier.height(6.dp))
+            CompactMeter("5H", s.fiveHourPct)
+        }
+        if (s.hasSevenDay) {
+            Spacer(GlanceModifier.height(6.dp))
+            CompactMeter("1W", s.sevenDayPct)
+        }
     }
 }
 

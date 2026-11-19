@@ -63,14 +63,17 @@ class Storage private constructor(
         get() = AuthState.entries.getOrElse(snapshot.getInt("auth_state", 0)) { AuthState.OK }
         set(v) = snapshot.edit().putInt("auth_state", v.ordinal).apply()
 
-    val hasSnapshot: Boolean get() = fiveHourUtil >= 0f
+    val hasSnapshot: Boolean get() = fetchedAt > 0L && (hasFiveHour || hasSevenDay)
+    val hasFiveHour: Boolean get() = fiveHourUtil >= 0f
+    val hasSevenDay: Boolean get() = sevenDayUtil >= 0f
 
     fun saveSnapshot(s: UsageSnapshot) {
         snapshot.edit()
-            .putFloat("fh_util", s.fiveHour.utilization)
-            .putLong("fh_reset", s.fiveHour.resetsAtEpochMs)
-            .putFloat("wk_util", s.sevenDay.utilization)
-            .putLong("wk_reset", s.sevenDay.resetsAtEpochMs)
+            // -1 marks a window this plan does not have; the widget hides that row.
+            .putFloat("fh_util", s.fiveHour?.utilization ?: -1f)
+            .putLong("fh_reset", s.fiveHour?.resetsAtEpochMs ?: 0L)
+            .putFloat("wk_util", s.sevenDay?.utilization ?: -1f)
+            .putLong("wk_reset", s.sevenDay?.resetsAtEpochMs ?: 0L)
             .putLong("fetched_at", s.fetchedAtEpochMs)
             .apply()
     }
