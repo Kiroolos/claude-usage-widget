@@ -15,10 +15,11 @@ import kotlin.math.roundToInt
 
 class UsageWidget : GlanceAppWidget() {
 
-    // Two reusable buckets; Glance maps any real size to the nearest one.
+    // Reusable buckets; Glance picks the largest one that fits the real size.
     override val sizeMode = SizeMode.Responsive(
         setOf(
-            DpSize(60.dp, 60.dp),    // Compact (~1x1)
+            DpSize(60.dp, 40.dp),    // Compact (~1x1, 2x1)
+            DpSize(180.dp, 40.dp),   // Wide but one cell tall (3x1, 4x1)
             DpSize(180.dp, 110.dp),  // Full
         )
     )

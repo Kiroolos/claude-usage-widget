@@ -47,6 +47,7 @@ data class WidgetState(
 )
 
 private val COMPACT_MAX_WIDTH = 130.dp
+private val FULL_MIN_HEIGHT = 100.dp
 
 // Colors come from resources so they auto-adapt to light/dark via values-night.
 private val accent = ColorProvider(R.color.accent)
@@ -56,6 +57,7 @@ private fun barTrack() = ColorProvider(R.color.bar_track)
 fun UsageWidgetContent(state: WidgetState) {
     val size = LocalSize.current
     val compact = size.width < COMPACT_MAX_WIDTH
+    val short = size.height < FULL_MIN_HEIGHT
     val context = LocalContext.current
 
     val tap = if (state.needsLogin) {
@@ -76,6 +78,7 @@ fun UsageWidgetContent(state: WidgetState) {
             state.needsLogin -> SignInPrompt(compact)
             !state.hasData -> Loading(compact)
             compact -> CompactLayout(state)
+            short -> WideLayout(state)
             else -> FullLayout(state)
         }
         if (state.hasData && state.stale) StaleDot()
@@ -105,6 +108,56 @@ private fun FullLayout(s: WidgetState) {
             Spacer(GlanceModifier.height(10.dp))
             MeterRow("1W", s.sevenDayPct, s.sevenDayResets)
         }
+    }
+}
+
+/** One cell tall (3x1, 4x1): no header, but keeps the "resets in" text. */
+@Composable
+private fun WideLayout(s: WidgetState) {
+    Column(
+        modifier = GlanceModifier.fillMaxSize(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        if (s.hasFiveHour && s.hasSevenDay) {
+            // Two windows do not fit as text-over-bar in one cell: one line each.
+            InlineMeter("5H", s.fiveHourPct, s.fiveHourResets)
+            Spacer(GlanceModifier.height(4.dp))
+            InlineMeter("1W", s.sevenDayPct, s.sevenDayResets)
+        } else if (s.hasFiveHour) {
+            MeterRow("5H", s.fiveHourPct, s.fiveHourResets)
+        } else {
+            MeterRow("1W", s.sevenDayPct, s.sevenDayResets)
+        }
+    }
+}
+
+@Composable
+private fun InlineMeter(label: String, pct: Int, resets: String) {
+    Row(
+        modifier = GlanceModifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            label,
+            style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant, fontWeight = FontWeight.Bold),
+            modifier = GlanceModifier.width(28.dp),
+        )
+        Text(
+            "$pct%",
+            style = TextStyle(color = GlanceTheme.colors.onSurface, fontWeight = FontWeight.Bold),
+            modifier = GlanceModifier.width(44.dp),
+        )
+        LinearProgressIndicator(
+            progress = (pct.coerceIn(0, 100)) / 100f,
+            modifier = GlanceModifier.defaultWeight().height(6.dp).cornerRadius(3.dp),
+            color = accent,
+            backgroundColor = barTrack(),
+        )
+        Spacer(GlanceModifier.width(8.dp))
+        Text(
+            "resets in $resets",
+            style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant),
+        )
     }
 }
 
