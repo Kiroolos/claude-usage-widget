@@ -15,7 +15,7 @@ Keeps your `5H` and `1W` percentages (plus *“resets in”* countdowns) live on
 
 <br />
 
-### [![Download APK](https://img.shields.io/badge/⬇%20Download%20APK-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/utaysi/claude-usage-widget/releases/latest/download/claude-usage-widget.apk)
+### [![Download APK](https://img.shields.io/badge/⬇%20Download%20APK-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/Kiroolos/claude-usage-widget/releases/latest/download/claude-usage-widget.apk)
 
 Sign in once on the phone; the widget refreshes itself in the background.
 
@@ -25,11 +25,13 @@ Sign in once on the phone; the widget refreshes itself in the background.
 
 ## 📲 Install in 3 steps
 
-1. **[Download the APK](https://github.com/utaysi/claude-usage-widget/releases/latest/download/claude-usage-widget.apk)** on your Android phone (tap the button above).
+1. **[Download the APK](https://github.com/Kiroolos/claude-usage-widget/releases/latest/download/claude-usage-widget.apk)** on your Android phone (tap the button above).
 2. **Open the downloaded file** and tap **Install**.
 3. The first time, Android asks to **allow installs from this source** (your browser or file app). Tap **Settings → enable “Allow from this source” → back → Install**. If Play Protect shows an *“unsafe app?”* prompt, that warning appears for any app not installed from the Play Store; choose **Install anyway**.
 
 > Why the warnings? The APK is sideloaded rather than shipped through the Play Store, so Android plays it safe. It's the normal two-tap detour for any direct APK.
+
+> **Two APKs per release.** `claude-usage-widget.apk` is the standard app (`com.usage.claudewidget`). [`claude-usage-widget-ultra.apk`](https://github.com/Kiroolos/claude-usage-widget/releases/latest/download/claude-usage-widget-ultra.apk) is the same code under a second package name (`com.usage.claudewidget.ultra`, shown as *Claude Usage+*), so it installs side by side with the standard one. Both handle plans that only have a weekly limit.
 
 Then continue with first-run setup below.
 

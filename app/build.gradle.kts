@@ -22,11 +22,23 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.usage.claudewidget.ultra"
+        applicationId = "com.usage.claudewidget"
         minSdk = 26
         targetSdk = 36
-        versionCode = 5
-        versionName = "1.2"
+        versionCode = 6
+        versionName = "1.3"
+    }
+
+    // Two installable variants built from the same code:
+    //  - original: com.usage.claudewidget        ("Claude Usage")
+    //  - ultra:    com.usage.claudewidget.ultra  ("Claude Usage+"), installs side by side
+    flavorDimensions += "variant"
+    productFlavors {
+        create("original") { dimension = "variant" }
+        create("ultra") {
+            dimension = "variant"
+            applicationIdSuffix = ".ultra"
+        }
     }
 
     signingConfigs {

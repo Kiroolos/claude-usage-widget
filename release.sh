@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
-# Cut a new release: bump version, build the signed APK, tag, and publish to
-# GitHub Releases with a stable asset name.
+# Cut a new release: bump version, build both signed APKs (original and ultra
+# package names), tag, and publish to GitHub Releases with stable asset names.
 #
 #   ./release.sh 1.1
 #
@@ -19,9 +19,12 @@
 
 set -euo pipefail
 
-ASSET_NAME="claude-usage-widget.apk"
+FLAVORS=(original ultra)
+declare -A ASSET_NAMES=(
+    [original]="claude-usage-widget.apk"
+    [ultra]="claude-usage-widget-ultra.apk"
+)
 GRADLE_FILE="app/build.gradle.kts"
-APK_OUT="app/build/outputs/apk/release/app-release.apk"
 
 if [[ $# -ne 1 ]]; then
     echo "usage: ./release.sh <versionName>   e.g. ./release.sh 1.1" >&2
@@ -53,7 +56,7 @@ echo "==> Setting versionName=${VERSION_NAME}, versionCode=${VERSION_CODE}"
 sed -i -E "s/versionCode = [0-9]+/versionCode = ${VERSION_CODE}/" "$GRADLE_FILE"
 sed -i -E "s/versionName = \"[^\"]*\"/versionName = \"${VERSION_NAME}\"/" "$GRADLE_FILE"
 
-echo "==> Building signed release APK"
+echo "==> Building signed release APKs"
 ./gradlew :app:assembleRelease
 
 echo "==> Committing version bump and tagging ${TAG}"
@@ -63,10 +66,14 @@ git tag "$TAG"
 git push origin HEAD --tags
 
 echo "==> Publishing GitHub Release ${TAG}"
-cp "$APK_OUT" "$ASSET_NAME"
-gh release create "$TAG" "$ASSET_NAME" \
+ASSETS=()
+for flavor in "${FLAVORS[@]}"; do
+    cp "app/build/outputs/apk/${flavor}/release/app-${flavor}-release.apk" "${ASSET_NAMES[$flavor]}"
+    ASSETS+=("${ASSET_NAMES[$flavor]}")
+done
+gh release create "$TAG" "${ASSETS[@]}" \
     --title "$TAG" \
     --generate-notes
-rm -f "$ASSET_NAME"
+rm -f "${ASSETS[@]}"
 
-echo "==> Done. https://github.com/utaysi/claude-usage-widget/releases/tag/${TAG}"
+echo "==> Done. $(gh release view "$TAG" --json url -q .url)"
